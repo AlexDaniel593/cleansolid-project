@@ -1,36 +1,34 @@
-interface User {
-    id: number;
-    name: string;
-}
+import { SubscriptionBloc } from './subscription-bloc';
+import { UserService } from './user-service';
+import { Mailer } from './mailer';
+import { User } from './user';
 
-// Esta clase viola el Principio de Responsabilidad Única (SRP)
 class UserBloc {
+    private userService: UserService;
+    private mailer: Mailer;
 
-    loadUser( id: number ) {
-        // Simula la carga de un usuario
-        console.log('Cargando usuario con id:', id);
+    constructor( userService: UserService, mailer: Mailer ) {
+        this.userService = userService;
+        this.mailer = mailer;
     }
 
-    saveUser( user: User ) {
-        // Simula el guardado en base de datos
-        console.log('Guardando en base de datos:', user );
+    getUser( id: number ) {
+        return this.userService.loadUser( id );
     }
 
-    notifyUser() {
-        // Simula el envío de notificaciones
-        console.log('Enviando correo a los usuarios');
-    }
-
-    onAddSubscription( subscriptionId: number ) {
-        // Simula la gestión de suscripciones
-        console.log('Agregando suscripción:', subscriptionId );
+    createUser( user: User ) {
+        this.userService.saveUser( user );
+        this.mailer.sendEmail( user.name, 'Bienvenido' );
     }
 
 }
 
-const userBloc = new UserBloc();
+const userService = new UserService();
+const mailer = new Mailer();
+const subscriptionBloc = new SubscriptionBloc();
 
-userBloc.loadUser(10);
-userBloc.saveUser({ id: 10, name: 'Fernando' });
-userBloc.notifyUser();
-userBloc.onAddSubscription(1234);
+const userBloc = new UserBloc( userService, mailer );
+
+userBloc.getUser(10);
+userBloc.createUser({ id: 10, name: 'Fernando' });
+subscriptionBloc.onAddSubscription(1234);
